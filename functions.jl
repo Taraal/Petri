@@ -179,3 +179,87 @@ function mainAleaScript(petriInstance::Petri)
         end
     end
 end
+
+
+#-----------Creation du vecteur de Marquage-----------#
+function getM(petriInstance::Petri)
+    #Array de zeros de la taille du nombre de places
+    sortedById = zeros(Int8, size(petriInstance.places)[1])
+
+    #Tri des objets par id, et tableau des jetons créé
+    for p in petriInstance.places
+        sortedById[(p.id)] = p.jetons
+    end
+
+    return sortedById
+end
+
+#-----------Creation des matrices U- et U+-----------#
+function getUplusUmoins(petriInstance::Petri)
+    i = size(petriInstance.places)[1]           #Nombre de places
+    j = size(petriInstance.transitions)[1]      #Nombre de transitions
+
+    uPlus = zeros(Int16, i, j)          #Array size : ixj, content : zeros
+    uMoins = zeros(Int16, i, j)         #Array size : ixj, content : zeros
+
+    #Pour chaque transition
+    for t in petriInstance.transitions
+        #Pour chaque arcFrom et ArcTo
+        #i est egal à la place liée à l'arc
+        #j vaut la transition actuelle
+        #U+[i, j] vaut la capacité de l'arc
+        for at in t.arcsTo
+            uPlus[at.to, t.id] = at.capacite
+        end
+
+        for af in t.arcsFrom
+            uMoins[af.from, t.id] = af.capacite
+        end
+    end
+    return [uPlus, uMoins]
+end
+
+
+
+function matrices(petriInstance::Petri)
+    M = getM(petriInstance)     #Vecteur de marquage
+
+    ArraysU = getUplusUmoins(petriInstance)     #Matrices U+ et U-
+
+    UPlus = ArraysU[1]
+    UMoins = ArraysU[2]
+
+    U = UPlus - UMoins
+    return [M, U, UPlus, UMoins]
+end
+
+function reseau(UP, UM, Marq)
+    places = Place[]
+
+    for i = 1:size(Marq)[1]
+        push!(places, Place("Place $i",i,Marq[i]))
+    end
+
+    transitions = Transition[]
+
+    if (size(UP)[2]) != (size(UM)[2])
+        error("Pas le meme nombre de transitions entre UPlus et UMoins")
+    else
+        for j = 1:size(UM)[2]
+            arcsF = ArcFrom[]
+            arcsT = ArcTo[]
+
+            for i = 1:size(Marq)[1]
+                if UP[i,j] != 0
+                    push!(arcsT, ArcTo(i, UP[i,j]))
+                end
+
+                if UM[i,j] != 0
+                    push!(arcsF, ArcFrom(i, UM[i,j]))
+                end
+            end
+            push!(transitions, Transition("T $j", j, arcsF, arcsT))
+        end
+    end
+    return Petri(places, transitions, [])
+end
