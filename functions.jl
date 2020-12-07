@@ -244,6 +244,7 @@ function matrices(petriInstance::Petri)
     UMoins = ArraysU[2]
 
     U = UPlus - UMoins
+
     return [M, U, UPlus, UMoins]
 end
 
@@ -278,10 +279,14 @@ function reseau(UP, UM, Marq)
     return Petri(places, transitions, [])
 end
 
-#Todo
-function solMat(petriInstance::Petri)
-    result = matrices(petriInstance)
 
-    Mzero = result[1]
-    U = result[2]
+function solMat(M, Mzero, U)
+
+    matriceTemp = transpose(M) - transpose(Mzero)
+
+    Ut = transpose(U)    #Places stockées en colonnes sur U et places stockées en ligne sur M, on transpose pour pouvoir effectuer le calcul
+    Xt = matriceTemp / Ut    #Div car on ne peut pas utiliser inv() -> matrices non carrées non supportées sur inv
+
+    #Mtreproduit = transpose(Mzero) + Ut * Xt
+    return Xt
 end

@@ -84,13 +84,30 @@ function testReseau(petri::Petri)
     println(newR.evenements)
 end
 
+function testSolMat()
+    places = [Place("OFF",1,1), Place("ON",2,0),Place("Changement",3,0)]
+    transitions = [Transition("Allumer",1,[ArcFrom(1,1), ArcFrom(3,1)],[ArcTo(2,1)]), Transition("Eteindre",2,[ArcFrom(2,1), ArcFrom(3,1)],[ArcTo(1,1)])]
+    event = [Event("Action", "Changement")]
+
+    instance = Petri( [places[1], places[2], places[3]], [transitions[1], transitions[2]], [event[1]] )
+
+    result = matrices(instance)
+
+    M = Int8[0, 1, 0]
+    Mz = result[1]
+    U = result[2]
+
+    println(solMat(M,Mz,U))
+
+end
+
 function main()
     places = [Place("P1",1,1), Place("P2",2,0),Place("P3",3,1)]
     transitions = [Transition("T1",1,[ArcFrom(1,1), ArcFrom(3,1)],[ArcTo(2,1)]), Transition("T2",2,[ArcFrom(2,1), ArcFrom(3,1)],[ArcTo(1,1)])]
     event = [Event("Action", "P3")]
     petri = Petri( [places[1], places[2], places[3]], [transitions[1], transitions[2]], [event[1]] )
 
-    #testAffichagePetri(petri)
+    #testAffichagePetri(petri)          #Test Affichage
     #testFranchissable(petri,"T1")      #Franchissable
     #testFranchissable(petri,"T2")      #Non franchissable
     #testTransiter(petri,"T1")          #T1 Franchissable
@@ -98,6 +115,7 @@ function main()
     #testActionner("Action")            #Action sur P3
     #testMatrices(petri)                #Creation de matrices a partir d'un Petri object
     #testReseau(petri)                  #Creation reseau a partir de matrices
+    testSolMat()                       #Test fonction solMat
 end
 
 
