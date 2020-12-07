@@ -119,7 +119,7 @@ function transiterAlea(petriInstance::Petri)
 
     if estFranchi
         transiter(petriInstance,currentT)   #Si oui on active la transition
-        println("Transition actionnee")
+        println("Transition actionnee car franchissable")
         println(" ")
         return true
     else
@@ -148,13 +148,21 @@ end
 #-----------Action-----------#
 #Ajoute un jeton dans un evenement
 function actionner(petriInstance::Petri, eventName::String)
-    for p in petriInstance.places
-        if p.nom == eventName
-            p.jetons = p.jetons + 1
-            return true
+    for e in petriInstance.evenements
+        if eventName == e.name
+            placeTarget = e.pointOnPlace
+
+            for p in petriInstance.places
+                if p.nom == placeTarget
+                    p.jetons = p.jetons + 1
+                    return true
+                end
+            end
         end
     end
-    error("Do not find event called : $eventName")
+
+
+    error("Do not find event called : $placeTarget")
 end
 
 #-----------Script aleatoire-----------#
@@ -262,4 +270,12 @@ function reseau(UP, UM, Marq)
         end
     end
     return Petri(places, transitions, [])
+end
+
+#Todo
+function solMat(petriInstance::Petri)
+    result = matrices(petriInstance)
+
+    Mzero = result[1]
+    U = result[2]
 end

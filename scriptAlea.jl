@@ -11,6 +11,4 @@ bse = Petri( [placesBSE[1], placesBSE[2], placesBSE[3]], [transitionsBSE[1], tra
 #-----------------#
 
 #Fonction main
-#mainAleaScript(bse)
-
-matrices(bse)
+mainAleaScript(bse)

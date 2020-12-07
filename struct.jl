@@ -47,4 +47,4 @@ end
 #Constructeurs par defaut
 Place() = Place("Undefined",0,-1)
 Transition() = Transition("Undefined",0,[ArcFrom(-1,-1)],[ArcTo(-1,-1)])
-Petri() = (Place("Undefined",0,-1), Transition("Undefined",0,[ArcFrom(-1,-1)],[ArcTo(-1,-1)]))
+Petri() = ([Place("Undefined",0,-1)], [Transition("Undefined",0,[ArcFrom(-1,-1)],[ArcTo(-1,-1)])],[Event("1", "2")])
