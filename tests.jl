@@ -4,7 +4,9 @@ using Random
 
 
 function testAffichagePetri(petri::Petri)
+    println("Affichage complet")
     aff(petri)
+    println("Affichage partiel")
     repr(petri)
 end
 

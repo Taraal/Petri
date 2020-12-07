@@ -162,27 +162,33 @@ function actionner(petriInstance::Petri, eventName::String)
     end
 
 
-    error("Do not find event called : $placeTarget")
+    error("Do not find event called : $eventName")
 end
 
 #-----------Script aleatoire-----------#
 function mainAleaScript(petriInstance::Petri)
+    println("Etat Initial : ")
+    repr(petriInstance)
+    println(" ")
 
     while true
+        sleep(1)
         result = checkTransitionsState(petriInstance)   #Etat des transitions
         if result   #Si on peut activer une transition
 
             println(" ")
             repr(petriInstance)             #Affichage etat des Places
             println(" ")
+
+            sleep(1)
             transiterAlea(petriInstance)    #Transiter
 
         else        #Activer une action choisie au hasard
-            println("Action enclenchee")
+            println("Action enclenchee car pas de transition possible")
             nbEvent =  size(petriInstance.evenements)[1]
             if nbEvent != 0
                 index = rand(1:nbEvent)
-                actionner(petriInstance, petriInstance.evenements[index].pointOnPlace)
+                actionner(petriInstance, petriInstance.evenements[index].name)
             end
         end
     end
