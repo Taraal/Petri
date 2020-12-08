@@ -87,7 +87,6 @@ function transiter(petriInstance::Petri, nomTransition::String)
             end
             #Parcourir arcs to
             for at in t.arcsTo
-
                 #Pour chaque arc on parcourt tous les places pour trouver celui auquel l'arc est relié
                 for p in petriInstance.places
                     #Si on trouve un place correspondant a l'arc entrant etudie
@@ -163,6 +162,7 @@ function actionner(petriInstance::Petri, eventName::String)
 
 
     error("Do not find event called : $eventName")
+    return false
 end
 
 #-----------Script aleatoire-----------#
@@ -213,8 +213,8 @@ function getUplusUmoins(petriInstance::Petri)
     i = size(petriInstance.places)[1]           #Nombre de places
     j = size(petriInstance.transitions)[1]      #Nombre de transitions
 
-    uPlus = zeros(Int16, i, j)          #Array size : ixj, content : zeros
-    uMoins = zeros(Int16, i, j)         #Array size : ixj, content : zeros
+    uPlus = zeros(Int8, i, j)          #Array size : ixj, content : zeros
+    uMoins = zeros(Int8, i, j)         #Array size : ixj, content : zeros
 
     #Pour chaque transition
     for t in petriInstance.transitions
@@ -280,13 +280,35 @@ function reseau(UP, UM, Marq)
 end
 
 
+#----To check----#
+function manualTranspose(U)
+    uT = zeros(Int8, size(U)[2], size(U)[1])
+
+    for j in 1:size(U)[2]
+        for i in 1:size(U)[1]
+            uT[j,i] = U[size(U)[1] - (i - 1) , j]
+        end
+    end
+    return uT
+end
+
+#----To check----#
 function solMat(M, Mzero, U)
 
     matriceTemp = transpose(M) - transpose(Mzero)
 
-    Ut = transpose(U)    #Places stockées en colonnes sur U et places stockées en ligne sur M, on transpose pour pouvoir effectuer le calcul
-    Xt = matriceTemp / Ut    #Div car on ne peut pas utiliser inv() -> matrices non carrées non supportées sur inv
+    U = manualTranspose(U)
 
-    #Mtreproduit = transpose(Mzero) + Ut * Xt
-    return Xt
+    X = matriceTemp / U    #Div car on ne peut pas utiliser inv() -> matrices non carrées non supportées sur inv
+    X = [round(a) for a in X]
+
+    return X
+end
+
+#----To Do----#
+function resolution(petriInstance::Petri)
+    result = matrices(petriInstance)
+    Mzero = result[1]
+
+
 end
