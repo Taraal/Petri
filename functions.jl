@@ -1,7 +1,5 @@
 #Coder une fct d'aff graphique (dessin) ?
 
-
-
 #-----------Affichage de la structure Petri et de ses composants-----------#
 function aff(petriInstance::Petri)
 
@@ -159,7 +157,6 @@ function actionner(petriInstance::Petri, eventName::String)
             end
         end
     end
-
 
     error("Do not find event called : $eventName")
     return false

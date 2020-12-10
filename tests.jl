@@ -139,8 +139,8 @@ function main()
     #testActionner("Action")            #Action sur P3
     #testMatrices(petri)                #Creation de matrices a partir d'un Petri object
     #testReseau(petri)                  #Creation reseau a partir de matrices
-    #testSolMat()                       #Test fonction solMat
-    testResolution()                   #Test fonction résolution
+    testSolMat()                       #Test fonction solMat
+    #testResolution()                   #Test fonction résolution
 end
 
 
