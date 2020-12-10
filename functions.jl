@@ -1,5 +1,3 @@
-#Coder une fct d'aff graphique (dessin) ?
-
 #-----------Affichage de la structure Petri et de ses composants-----------#
 function aff(petriInstance::Petri)
 
@@ -112,7 +110,7 @@ function transiterAlea(petriInstance::Petri)
     currentT = transitionsNames[rand(1:size(transitionsNames)[1])]
     println("Transition aleatoire choisie : $currentT")
 
-    estFranchi = (franchissable(petriInstance,currentT))    #Check si la transition est franchissable
+    estFranchi = (franchissable(petriInstance,currentT))    #On vérifie si la transition est franchissable
 
     if estFranchi
         transiter(petriInstance,currentT)   #Si oui on active la transition
@@ -169,6 +167,7 @@ function mainAleaScript(petriInstance::Petri)
     repr(petriInstance)
     println(" ")
 
+    #Compteur d'arret
     cptLoopActions = 0
 
     while true
@@ -183,14 +182,19 @@ function mainAleaScript(petriInstance::Petri)
             sleep(1)
             transiterAlea(petriInstance)    #Transiter
 
-        else        #Activer une action choisie au hasard
-            println("Action enclenchee car pas de transition possible")
+        else
             nbEvent =  size(petriInstance.evenements)[1]
+
+            #Pour activer un evenement, il doit en exister au moins un
             if nbEvent != 0
+                #Condition d'arret du programme : On a le droit a 4 actions
                 if cptLoopActions == 4
                     println("Condition d'arret du fait du nombre d'actions deja effectuees")
                     return true
+
+                #Activer une action choisie au hasard
                 else
+                    println("Action enclenchee car pas de transition possible")
                     index = rand(1:nbEvent)
                     actionner(petriInstance, petriInstance.evenements[index].name)
                     cptLoopActions = cptLoopActions + 1
@@ -241,7 +245,7 @@ function getUplusUmoins(petriInstance::Petri)
 end
 
 
-
+#-----------Creation des matrices du systeme-----------#
 function matrices(petriInstance::Petri)
     M = getM(petriInstance)     #Vecteur de marquage
 
@@ -255,15 +259,20 @@ function matrices(petriInstance::Petri)
     return [M, U, UPlus, UMoins]
 end
 
+#-----------Creation du systeme a partir des matrices-----------#
 function reseau(UP, UM, Marq)
+
+    #Creation des places
     places = Place[]
 
     for i = 1:size(Marq)[1]
         push!(places, Place("Place $i",i,Marq[i]))
     end
 
+    #Creation des transitions
     transitions = Transition[]
 
+    #On verifie que U+ et U- sont de la même taille
     if (size(UP)[2]) != (size(UM)[2])
         error("Pas le meme nombre de transitions entre UPlus et UMoins")
     else
@@ -283,11 +292,11 @@ function reseau(UP, UM, Marq)
             push!(transitions, Transition("T $j", j, arcsF, arcsT))
         end
     end
-    return Petri(places, transitions, [])
+    return Petri(places, transitions, [])   #Retourne un systeme de petri
 end
 
 
-#----To check----#
+#----Correction de la matrice U----#
 function manualTranspose(U)
     uT = zeros(Int8, size(U)[2], size(U)[1])
 
@@ -299,7 +308,7 @@ function manualTranspose(U)
     return uT
 end
 
-#----To check----#
+#----Determine X----#
 function solMat(M, Mzero, U)
 
     matriceTemp = transpose(M) - transpose(Mzero)
@@ -309,31 +318,34 @@ function solMat(M, Mzero, U)
     X = matriceTemp / Unew    #Div car on ne peut pas utiliser inv() -> matrices non carrées non supportées sur inv
 
     for a = 1:size(X)[2]
-        X[a] = round(X[a])
+        X[a] = round(X[a])     #Arrondit pour avoir des entiers
     end
 
     return X
 end
 
 
-
-#----To Do----#
+#
 function resolution(petriInstance::Petri, marquageVoulu)
+
+    #Recuperation des matrices
     result = matrices(petriInstance)
     Mzero = result[1]
 
     transitionsNames = String[]
-    #Recuperations des noms des transitions
+    eventName = String[]
+
+    #Recuperation des noms des transitions
     for i in petriInstance.transitions
         push!(transitionsNames, i.nom)
     end
 
-    eventName = String[]
-
+    #Recuperation des noms des evenements
     for e in petriInstance.evenements
         push!(eventName, e.name)
     end
 
+    #Transition essayées
     passedTr = []
 
 
@@ -343,12 +355,13 @@ function resolution(petriInstance::Petri, marquageVoulu)
             #Choix aleatoire d'une transition
             currentT = transitionsNames[rand(1:size(transitionsNames)[1])]
             #println(currentT)
-            estFranchi = (franchissable(petriInstance,currentT))    #Check si la transition est franchissable
+            estFranchi = (franchissable(petriInstance,currentT))    #On verifie si la transition est franchissable
 
             if estFranchi
                 transiter(petriInstance,currentT)   #Si oui on active la transition
                 push!(passedTr,currentT)
 
+                #Condition de validation : on a trouvé l'état cherché
                 M = getM(petriInstance)
                 if M == marquageVoulu
                     return passedTr
@@ -358,10 +371,11 @@ function resolution(petriInstance::Petri, marquageVoulu)
             end
         else
 
+            #Choix d'un evenement aleatoire
             if (size(eventName)[1]) != 0
                 event = eventName[rand(1:size(eventName)[1])]
                 actionner(petriInstance, event)
-                #println(event)
+
             else
                 println("Bloqué si pas d'event")
                 return false

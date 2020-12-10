@@ -1,5 +1,6 @@
 #Une fois le réseau de petri cree, la seule var qui peut changer en fct de l'état du sytème est jetons
-#Place est mutable car on doit changer une var
+#Place est mutable car on doit changer une variables
+#Les autres structures ne sont pas mutables
 
 #------Place------#
 mutable struct Place

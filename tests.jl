@@ -3,6 +3,7 @@ include("functions.jl")
 using Random
 
 
+#---------Test fonction aff & repr---------#
 function testAffichagePetri(petri::Petri)
     println("Affichage complet")
     aff(petri)
@@ -10,6 +11,7 @@ function testAffichagePetri(petri::Petri)
     repr(petri)
 end
 
+#---------Test fonction franchissable---------#
 function testFranchissable(petri::Petri, TrName::String)
     result = franchissable(petri, TrName)
     if result
@@ -20,6 +22,7 @@ function testFranchissable(petri::Petri, TrName::String)
 
 end
 
+#---------Test fonction transiter---------#
 function testTransiter(petri::Petri, TrName::String)
     repr(petri)
     println(" ")
@@ -27,10 +30,12 @@ function testTransiter(petri::Petri, TrName::String)
     repr(petri)
 end
 
+#---------Test fonction transiterAlea---------#
 function testTransiterAlea(petri::Petri)
     transiterAlea(petri)
 end
 
+#---------Test fonction actionner---------#
 function testActionner(nomAction::String)
     #Petri propre a la fonction car jetonsP3 = 0
     places = [Place("P1",1,1), Place("P2",2,0),Place("P3",3,0)]
@@ -53,7 +58,7 @@ function testActionner(nomAction::String)
     repr(petri)
 end
 
-
+#---------Test fonction matrices---------#
 function testMatrices(petri::Petri)
     aff(petri)
     result = matrices(petri)
@@ -67,6 +72,7 @@ function testMatrices(petri::Petri)
     println("UMoins : $UMoins")
 end
 
+#---------Test fonction reseau---------#
 function testReseau(petri::Petri)
     result = matrices(petri)
     M = result[1]
@@ -84,8 +90,8 @@ function testReseau(petri::Petri)
     println(newR.evenements)
 end
 
+#---------Test fonction solMat---------#
 function testSolMat()
-
 
     places = [Place("OFF",1,1), Place("ON",2,0),Place("Changement",3,0)]
     transitions = [Transition("Allumer",1,[ArcFrom(1,1), ArcFrom(3,1)],[ArcTo(2,1)]), Transition("Eteindre",2,[ArcFrom(2,1), ArcFrom(3,1)],[ArcTo(1,1)])]
@@ -115,7 +121,8 @@ function testSolMat()
 
 end
 
-function testResolution()
+#---------Test fonction resolution---------#
+function testResolution(index)
     places = [Place("OFF",1,1), Place("ON",2,0),Place("Changement",3,0)]
     transitions = [Transition("Allumer",1,[ArcFrom(1,1), ArcFrom(3,1)],[ArcTo(2,1)]), Transition("Eteindre",2,[ArcFrom(2,1), ArcFrom(3,1)],[ArcTo(1,1)])]
     event = [Event("Action", "Changement")]
@@ -130,16 +137,20 @@ function testResolution()
     event2 = [Event("Action", "P1")]
     instance2 = Petri( [places2[1], places2[2], places2[3]], [transitions2[1], transitions2[2]], [event2[1]] )
 
+    #-------------Exemple 1-------------#
 
     #result = resolution(instance, [0,1,0])
     #println(result)
 
+    #-------------Exemple 2-------------#
 
-    result = resolution(instance1, [0,1,1])
-    println(result)
-
-    #result = resolution(instance2, [0,1,1])
+    #result = resolution(instance1, [0,1,1])
     #println(result)
+
+    #-------------Exemple 3-------------#
+
+    result = resolution(instance2, [0,1,1])
+    println(result)
 
 end
 
