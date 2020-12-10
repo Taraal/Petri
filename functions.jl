@@ -195,7 +195,7 @@ end
 #-----------Creation du vecteur de Marquage-----------#
 function getM(petriInstance::Petri)
     #Array de zeros de la taille du nombre de places
-    sortedById = zeros(Int8, size(petriInstance.places)[1])
+    sortedById = zeros(Int128, size(petriInstance.places)[1])
 
     #Tri des objets par id, et tableau des jetons créé
     for p in petriInstance.places
@@ -294,18 +294,69 @@ function solMat(M, Mzero, U)
 
     matriceTemp = transpose(M) - transpose(Mzero)
 
-    U = manualTranspose(U)
+    Unew = manualTranspose(U)
 
-    X = matriceTemp / U    #Div car on ne peut pas utiliser inv() -> matrices non carrées non supportées sur inv
-    X = [round(a) for a in X]
+    X = matriceTemp / Unew    #Div car on ne peut pas utiliser inv() -> matrices non carrées non supportées sur inv
+
+    for a = 1:size(X)[2]
+        X[a] = round(X[a])
+    end
 
     return X
 end
 
+
+
 #----To Do----#
-function resolution(petriInstance::Petri)
+function resolution(petriInstance::Petri, marquageVoulu)
     result = matrices(petriInstance)
     Mzero = result[1]
 
+    transitionsNames = String[]
+    #Recuperations des noms des transitions
+    for i in petriInstance.transitions
+        push!(transitionsNames, i.nom)
+    end
 
+    eventName = String[]
+
+    for e in petriInstance.evenements
+        push!(eventName, e.name)
+    end
+
+    passedTr = []
+
+
+    while true
+        result = checkTransitionsState(petriInstance)   #Etat des transitions
+        if result   #Si on peut activer une transition
+            #Choix aleatoire d'une transition
+            currentT = transitionsNames[rand(1:size(transitionsNames)[1])]
+            #println(currentT)
+            estFranchi = (franchissable(petriInstance,currentT))    #Check si la transition est franchissable
+
+            if estFranchi
+                transiter(petriInstance,currentT)   #Si oui on active la transition
+                push!(passedTr,currentT)
+
+                M = getM(petriInstance)
+                if M == marquageVoulu
+                    return passedTr
+                end
+
+
+            end
+        else
+
+            if (size(eventName)[1]) != 0
+                event = eventName[rand(1:size(eventName)[1])]
+                actionner(petriInstance, event)
+                #println(event)
+            else
+                println("Bloqué si pas d'event")
+                return false
+            end
+
+        end
+    end
 end
