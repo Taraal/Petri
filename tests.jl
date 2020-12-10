@@ -162,7 +162,7 @@ function main()
     #testMatrices(petri)                #Creation de matrices a partir d'un Petri object
     #testReseau(petri)                  #Creation reseau a partir de matrices
     #testSolMat()                       #Test fonction solMat
-    testResolution()                   #Test fonction résolution
+    #testResolution()                   #Test fonction résolution
 end
 
 

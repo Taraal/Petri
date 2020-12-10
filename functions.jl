@@ -162,11 +162,14 @@ function actionner(petriInstance::Petri, eventName::String)
     return false
 end
 
+
 #-----------Script aleatoire-----------#
 function mainAleaScript(petriInstance::Petri)
     println("Etat Initial : ")
     repr(petriInstance)
     println(" ")
+
+    cptLoopActions = 0
 
     while true
         sleep(1)
@@ -184,8 +187,15 @@ function mainAleaScript(petriInstance::Petri)
             println("Action enclenchee car pas de transition possible")
             nbEvent =  size(petriInstance.evenements)[1]
             if nbEvent != 0
-                index = rand(1:nbEvent)
-                actionner(petriInstance, petriInstance.evenements[index].name)
+                if cptLoopActions == 4
+                    println("Condition d'arret du fait du nombre d'actions deja effectuees")
+                    return true
+                else
+                    index = rand(1:nbEvent)
+                    actionner(petriInstance, petriInstance.evenements[index].name)
+                    cptLoopActions = cptLoopActions + 1
+                end
+
             end
         end
     end
